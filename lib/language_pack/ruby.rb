@@ -1217,12 +1217,16 @@ params = CGI.parse(uri.query || "")
       precompile = rake.task("assets:precompile")
       return true unless precompile.is_defined?
 
-      topic "Precompiling assets"
-      precompile.invoke(env: rake_env)
-      if precompile.success?
-        puts "Asset precompilation completed (#{"%.2f" % precompile.time}s)"
+      if ENV['SKIP_ASSET_PRECOMPILE']
+        topic "SKIP_ASSET_PRECOMPILE is set - skipping asset precompilation"
       else
-        precompile_fail(precompile.output)
+        topic "Precompiling assets"
+        precompile.invoke(env: rake_env)
+        if precompile.success?
+          puts "Asset precompilation completed (#{"%.2f" % precompile.time}s)"
+        else
+          precompile_fail(precompile.output)
+        end
       end
     end
   end
